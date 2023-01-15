@@ -38,7 +38,7 @@ namespace JojofiedMonk
             var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "jojo.png");
             var jojoImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
 
-            WindowSystem.AddWindow(new ConfigWindow(this));
+            WindowSystem.AddWindow(new ConfigWindow(this, chatGui));
             WindowSystem.AddWindow(new MainWindow(this, jojoImage));
 
             this.CommandManager.AddHandler(jojoCommand, new CommandInfo(OnCommand)
@@ -82,12 +82,12 @@ namespace JojofiedMonk
                 case "ora":
                     Configuration.SoundOption = SoundOption.ORA;
                     Configuration.Save();
-                    chatGui.Print("Jojofied sound option is now Ora Ora");
+                    chatGui.Print("Ora Ora will now be played");
                     break;
                 case "muda":
                     Configuration.SoundOption = SoundOption.MUDA;
                     Configuration.Save();
-                    chatGui.Print("Jojofied sound option is now Muda Muda");
+                    chatGui.Print("Muda Muda will now be played");
                     break;
                 case "":
                     // in response to the slash command, just display our main ui
@@ -103,7 +103,6 @@ namespace JojofiedMonk
 
         private void OnSettingsCommand(string command, string args)
         {
-            chatGui.Print("settings");
             DrawConfigUI();
         }
 
