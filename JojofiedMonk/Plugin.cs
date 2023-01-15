@@ -80,16 +80,23 @@ namespace JojofiedMonk
                     chatGui.Print("Jojofied is now disabled");
                     break;
                 case "ora":
-                    // TODO: Change to Ora Ora sound
-                    chatGui.Print("ora ora");
+                    Configuration.SoundOption = SoundOption.ORA;
+                    Configuration.Save();
+                    chatGui.Print("Jojofied sound option is now Ora Ora");
                     break;
                 case "muda":
-                    // TODO: Change to Muda Muda sound
-                    chatGui.Print("muda muda");
+                    Configuration.SoundOption = SoundOption.MUDA;
+                    Configuration.Save();
+                    chatGui.Print("Jojofied sound option is now Muda Muda");
                     break;
-                default:
+                case "":
                     // in response to the slash command, just display our main ui
                     WindowSystem.GetWindow("Jojofied").IsOpen = true;
+                    break;
+                default:
+                    chatGui.Print("Invalid usage: Command must be \"/jojo <option>\"\n" +
+                                  "on / off / toggle - Enables or disables sound\n" +
+                                  "ora / muda - Changes the sound that will be played");
                     break;
             }
         }
