@@ -11,7 +11,7 @@ namespace JojofiedMonk
         public int Version { get; set; } = 0;
 
         public bool SoundEnabled { get; set; } = true;
-        public SoundChoice choice { get; set; } = SoundChoice.ORA;
+        public SoundOption SoundOption { get; set; } = SoundOption.ORA;
 
         // the below exist just to make saving less cumbersome
         [NonSerialized]

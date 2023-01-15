@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JojofiedMonk
 {
-    public enum SoundChoice
+    public enum SoundOption
     {
         ORA,
         MUDA
