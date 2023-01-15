@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
@@ -16,7 +17,13 @@ namespace JojofiedMonk
         private const string jojoCommand = "/jojo";
         private const string jojoSettings = "/jojosettings";
 
-        private DalamudPluginInterface PluginInterface { get; init; }
+        public Dictionary<SoundOption, string> soundOptionsDict = new Dictionary<SoundOption, string>
+        {
+            { SoundOption.ORA, "Ora Ora" },
+            { SoundOption.MUDA, "Muda  Muda" }
+        };
+
+private DalamudPluginInterface PluginInterface { get; init; }
         private CommandManager CommandManager { get; init; }
         public Configuration Configuration { get; init; }
         public WindowSystem WindowSystem = new("JojofiedMonk");
@@ -82,12 +89,16 @@ namespace JojofiedMonk
                 case "ora":
                     Configuration.SoundOption = SoundOption.ORA;
                     Configuration.Save();
-                    chatGui.Print("Ora Ora will now be played");
+                    chatGui.Print($"{soundOptionsDict[SoundOption.ORA]} will now be played");
                     break;
                 case "muda":
                     Configuration.SoundOption = SoundOption.MUDA;
                     Configuration.Save();
-                    chatGui.Print("Muda Muda will now be played");
+                    chatGui.Print($"{soundOptionsDict[SoundOption.MUDA]} will now be played");
+                    break;
+                case "play":
+                case "test":
+                    // TODO: Play a test sound
                     break;
                 case "":
                     // in response to the slash command, just display our main ui

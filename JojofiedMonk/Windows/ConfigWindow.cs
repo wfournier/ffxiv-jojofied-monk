@@ -12,6 +12,7 @@ namespace JojofiedMonk.Windows;
 
 public class ConfigWindow : Window, IDisposable
 {
+    private Plugin plugin;
     private Configuration Configuration;
     private ChatGui chatGui;
 
@@ -23,6 +24,7 @@ public class ConfigWindow : Window, IDisposable
         this.Size = new Vector2(300, 120);
         this.SizeCondition = ImGuiCond.Always;
 
+        this.plugin = plugin;
         this.Configuration = plugin.Configuration;
         this.chatGui = chatGui;
     }
@@ -38,16 +40,11 @@ public class ConfigWindow : Window, IDisposable
             this.Configuration.Save();
         }
 
-        var optionsDict = new Dictionary<SoundOption, string>
-        {
-            { SoundOption.ORA, "Ora Ora" },
-            { SoundOption.MUDA, "Muda  Muda" }
-        };
         var soundOptionIndex = (int)Configuration.SoundOption;
-        if (ImGui.ListBox("Sound options", ref soundOptionIndex, optionsDict.Values.ToArray(), optionsDict.Count))
+        if (ImGui.ListBox("Sound options", ref soundOptionIndex, plugin.soundOptionsDict.Values.ToArray(), plugin.soundOptionsDict.Count))
         {
             this.Configuration.SoundOption = (SoundOption)soundOptionIndex;
-            chatGui.Print($"{optionsDict[Configuration.SoundOption]} will now be played");
+            chatGui.Print($"{plugin.soundOptionsDict[Configuration.SoundOption]} will now be played");
             this.Configuration.Save();
         }
 

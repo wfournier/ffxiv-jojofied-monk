@@ -12,13 +12,9 @@ public class MainWindow : Window, IDisposable
     private Plugin Plugin;
 
     public MainWindow(Plugin plugin, TextureWrap jojoImage) : base(
-        "Jojofied", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+        "Jojofied", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
-        this.SizeConstraints = new WindowSizeConstraints
-        {
-            MinimumSize = new Vector2(375, 330),
-            MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
-        };
+        this.Size = new Vector2(280, 330);
 
         this.jojoImage = jojoImage;
         this.Plugin = plugin;
