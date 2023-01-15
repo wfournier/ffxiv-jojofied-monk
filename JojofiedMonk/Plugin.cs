@@ -65,6 +65,20 @@ namespace JojofiedMonk
         {
             switch (args)
             {
+                case "on":
+                case "toggle" when !Configuration.SoundEnabled:
+                case "t" when !Configuration.SoundEnabled:
+                    Configuration.SoundEnabled = true;
+                    Configuration.Save();
+                    chatGui.Print("Jojofied is now enabled");
+                    break;
+                case "off":
+                case "toggle" when Configuration.SoundEnabled:
+                case "t" when Configuration.SoundEnabled:
+                    Configuration.SoundEnabled = false;
+                    Configuration.Save();
+                    chatGui.Print("Jojofied is now disabled");
+                    break;
                 case "ora":
                     // TODO: Change to Ora Ora sound
                     chatGui.Print("ora ora");
@@ -72,11 +86,6 @@ namespace JojofiedMonk
                 case "muda":
                     // TODO: Change to Muda Muda sound
                     chatGui.Print("muda muda");
-                    break;
-                case "t":
-                case "toggle":
-                    // TODO: Toggle sound to enabled/disabled
-                    chatGui.Print("toggle");
                     break;
                 default:
                     // in response to the slash command, just display our main ui
