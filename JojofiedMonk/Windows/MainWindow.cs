@@ -1,18 +1,18 @@
-﻿using System;
+using System;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using ImGuiScene;
 
-namespace SamplePlugin.Windows;
+namespace JojofiedMonk.Windows;
 
 public class MainWindow : Window, IDisposable
 {
-    private TextureWrap GoatImage;
+    private TextureWrap jojoImage;
     private Plugin Plugin;
 
-    public MainWindow(Plugin plugin, TextureWrap goatImage) : base(
-        "My Amazing Window", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+    public MainWindow(Plugin plugin, TextureWrap jojoImage) : base(
+        "Jojofied", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         this.SizeConstraints = new WindowSizeConstraints
         {
@@ -20,18 +20,18 @@ public class MainWindow : Window, IDisposable
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
 
-        this.GoatImage = goatImage;
+        this.jojoImage = jojoImage;
         this.Plugin = plugin;
     }
 
     public void Dispose()
     {
-        this.GoatImage.Dispose();
+        this.jojoImage.Dispose();
     }
 
     public override void Draw()
     {
-        ImGui.Text($"The random config bool is {this.Plugin.Configuration.SomePropertyToBeSavedAndWithADefault}");
+        ImGui.Text($"The plugin is currently {(this.Plugin.Configuration.SoundEnabled ? "enabled" : "disabled")}");
 
         if (ImGui.Button("Show Settings"))
         {
@@ -40,9 +40,7 @@ public class MainWindow : Window, IDisposable
 
         ImGui.Spacing();
 
-        ImGui.Text("Have a goat:");
-        ImGui.Indent(55);
-        ImGui.Image(this.GoatImage.ImGuiHandle, new Vector2(this.GoatImage.Width, this.GoatImage.Height));
-        ImGui.Unindent(55);
+        ImGui.Image(this.jojoImage.ImGuiHandle, new Vector2(this.jojoImage.Width, this.jojoImage.Height));
+        ImGui.Text("Plugin by wfournier (Cidolfus Highwind)");
     }
 }

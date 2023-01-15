@@ -3,20 +3,26 @@ using Dalamud.IoC;
 using Dalamud.Plugin;
 using System.IO;
 using System.Reflection;
+using Dalamud.Game.Gui;
 using Dalamud.Interface.Windowing;
-using SamplePlugin.Windows;
+using JojofiedMonk.Windows;
 
-namespace SamplePlugin
+namespace JojofiedMonk
 {
     public sealed class Plugin : IDalamudPlugin
     {
         public string Name => "Jojofied Monk";
-        private const string CommandName = "/jojo";
+
+        private const string jojoCommand = "/jojo";
+        private const string jojoSettings = "/jojosettings";
 
         private DalamudPluginInterface PluginInterface { get; init; }
         private CommandManager CommandManager { get; init; }
         public Configuration Configuration { get; init; }
         public WindowSystem WindowSystem = new("JojofiedMonk");
+
+        [PluginService]
+        public ChatGui chatGui { get; private set; }
 
         public Plugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
@@ -29,15 +35,20 @@ namespace SamplePlugin
             this.Configuration.Initialize(this.PluginInterface);
 
             // you might normally want to embed resources and load them from the manifest stream
-            var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-            var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
+            var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "jojo.png");
+            var jojoImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
 
             WindowSystem.AddWindow(new ConfigWindow(this));
-            WindowSystem.AddWindow(new MainWindow(this, goatImage));
+            WindowSystem.AddWindow(new MainWindow(this, jojoImage));
 
-            this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+            this.CommandManager.AddHandler(jojoCommand, new CommandInfo(OnCommand)
             {
-                HelpMessage = "A useful message to display in /xlhelp"
+                HelpMessage = "Open main plugin window"
+            });
+
+            this.CommandManager.AddHandler(jojoSettings, new CommandInfo(OnSettingsCommand)
+            {
+                HelpMessage = "Open plugin settings"
             });
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
@@ -47,13 +58,37 @@ namespace SamplePlugin
         public void Dispose()
         {
             this.WindowSystem.RemoveAllWindows();
-            this.CommandManager.RemoveHandler(CommandName);
+            this.CommandManager.RemoveHandler(jojoCommand);
         }
 
         private void OnCommand(string command, string args)
         {
-            // in response to the slash command, just display our main ui
-            WindowSystem.GetWindow("My Amazing Window").IsOpen = true;
+            switch (args)
+            {
+                case "ora":
+                    // TODO: Change to Ora Ora sound
+                    chatGui.Print("ora ora");
+                    break;
+                case "muda":
+                    // TODO: Change to Muda Muda sound
+                    chatGui.Print("muda muda");
+                    break;
+                case "t":
+                case "toggle":
+                    // TODO: Toggle sound to enabled/disabled
+                    chatGui.Print("toggle");
+                    break;
+                default:
+                    // in response to the slash command, just display our main ui
+                    WindowSystem.GetWindow("Jojofied").IsOpen = true;
+                    break;
+            }
+        }
+
+        private void OnSettingsCommand(string command, string args)
+        {
+            chatGui.Print("settings");
+            DrawConfigUI();
         }
 
         private void DrawUI()
@@ -63,7 +98,7 @@ namespace SamplePlugin
 
         public void DrawConfigUI()
         {
-            WindowSystem.GetWindow("A Wonderful Configuration Window").IsOpen = true;
+            this.WindowSystem.GetWindow("Jojofied Configuration").IsOpen = true;
         }
     }
 }

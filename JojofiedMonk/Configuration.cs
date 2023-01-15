@@ -1,15 +1,17 @@
-﻿using Dalamud.Configuration;
+using Dalamud.Configuration;
 using Dalamud.Plugin;
 using System;
+using JojofiedMonk;
 
-namespace SamplePlugin
+namespace JojofiedMonk
 {
     [Serializable]
     public class Configuration : IPluginConfiguration
     {
         public int Version { get; set; } = 0;
 
-        public bool SomePropertyToBeSavedAndWithADefault { get; set; } = true;
+        public bool SoundEnabled { get; set; } = true;
+        public SoundChoice choice { get; set; } = SoundChoice.ORA;
 
         // the below exist just to make saving less cumbersome
         [NonSerialized]
