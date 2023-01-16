@@ -99,6 +99,7 @@ private DalamudPluginInterface PluginInterface { get; init; }
                 case "play":
                 case "test":
                     // TODO: Play a test sound
+                    chatGui.Print("test sound");
                     break;
                 case "":
                     // in response to the slash command, just display our main ui
@@ -107,7 +108,8 @@ private DalamudPluginInterface PluginInterface { get; init; }
                 default:
                     chatGui.Print("Invalid usage: Command must be \"/jojo <option>\"\n" +
                                   "on / off / toggle - Enables or disables sound\n" +
-                                  "ora / muda - Changes the sound that will be played");
+                                  "ora / muda - Changes the sound that will be played\n" +
+                                  "play / test - Plays the configured sound");
                     break;
             }
         }

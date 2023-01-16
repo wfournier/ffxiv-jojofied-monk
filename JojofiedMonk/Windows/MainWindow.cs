@@ -14,7 +14,7 @@ public class MainWindow : Window, IDisposable
     public MainWindow(Plugin plugin, TextureWrap jojoImage) : base(
         "Jojofied", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
-        this.Size = new Vector2(280, 330);
+        this.Size = new Vector2(280, 340);
 
         this.jojoImage = jojoImage;
         this.Plugin = plugin;
@@ -37,6 +37,7 @@ public class MainWindow : Window, IDisposable
         ImGui.Spacing();
 
         ImGui.Image(this.jojoImage.ImGuiHandle, new Vector2(this.jojoImage.Width, this.jojoImage.Height));
-        ImGui.Text("Plugin by wfournier (Cidolfus Highwind)");
+        ImGui.Text("Plugin by Cidolfus Highwind (Cactuar)\n" +
+                   "wfournier on GitHub");
     }
 }
