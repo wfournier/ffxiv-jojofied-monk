@@ -26,7 +26,6 @@ public class Configuration : IPluginConfiguration
     public void Save()
     {
         PluginInterface!.SavePluginConfig(this);
-        //plugin.SetAudioFile();
 
         if(!Enabled) plugin.StopSound();
     }

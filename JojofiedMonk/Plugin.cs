@@ -123,7 +123,7 @@ public sealed class Plugin : IDalamudPlugin
             case "stop":
             case "s":
                 StopSound();
-                chatGui.Print("Stopping sound");
+                chatGui.Print("[JojofiedMonk] Stopping sound");
                 break;
             case "":
                 // in response to the slash command, just display our main ui
@@ -158,14 +158,20 @@ public sealed class Plugin : IDalamudPlugin
                     var status = enumerator.Current;
                     if (status.GameData.Name == "Perfect Balance")
                     {
-                        if (status.RemainingTime > pbTimer)
+                        // For some god forsaken reason, the remaining time starts at -20 instead of 20
+                        var time = Math.Abs(status.RemainingTime);
+                        var stacks = status.StackCount;
+
+                        // If the time remaining is higher than previous update and stack count is 3 (meaning we just cast PB)
+                        if (time > pbTimer && stacks == 3)
                             PlaySound();
 
                         pbActive = true;
-                        pbTimer = status.RemainingTime;
+                        pbTimer = time;
                     }
                 }
 
+                // If Perfect Balance is not in the list of statuses, manually set timer to 0 just in case
                 if (!pbActive)
                     pbTimer = 0f;
             }
