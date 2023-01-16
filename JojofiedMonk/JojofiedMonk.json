@@ -4,12 +4,9 @@
     "Punchline": "Ora Ora's your Monk experience.",
     "Description": "Ora Ora's your Monk experience.",
     "InternalName": "jojofiedMonk",
+    "RepoUrl": "https://github.com/wfournier/ffxiv-jojofied-monk",
     "ApplicableVersion": "any",
     "Tags": [
-        "plugin",
-        "jojo",
-        "monk",
-        "ora",
-        "muda"
+        "monk"
     ]
 }

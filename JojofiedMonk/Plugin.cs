@@ -111,6 +111,7 @@ public sealed class Plugin : IDalamudPlugin
                 chatGui.Print($"[JojofiedMonk] {soundOptionsDict[SoundOption.MUDA]} will now be played");
                 break;
             case "play":
+            case "p":
             case "test":
                 if (Configuration.Enabled)
                 {
@@ -120,6 +121,7 @@ public sealed class Plugin : IDalamudPlugin
 
                 break;
             case "stop":
+            case "s":
                 StopSound();
                 chatGui.Print("Stopping sound");
                 break;
@@ -142,26 +144,35 @@ public sealed class Plugin : IDalamudPlugin
         DrawConfigUI();
     }
 
+    private float pbTimer = 0f;
+
     private void FrameworkOnUpdate(Framework framework)
     {
-        //if (!isSoundPlaying)
-        //{
-        //    using (var enumerator = ClientState.LocalPlayer?.StatusList.GetEnumerator())
-        //    {
-        //        while (enumerator != null && enumerator.MoveNext())
-        //        {
-        //            var status = enumerator.Current;
-        //            if (status.GameData.Name == "Perfect Balance")
-        //            {
-        //                PlaySound();
-        //                return;
-        //            }
-        //        }
-        //    }
-        //}
+        if (Configuration.Enabled)
+        {
+            using (var enumerator = ClientState.LocalPlayer?.StatusList.GetEnumerator())
+            {
+                var pbActive = false;
+                while (enumerator != null && enumerator.MoveNext())
+                {
+                    var status = enumerator.Current;
+                    if (status.GameData.Name == "Perfect Balance")
+                    {
+                        if (status.RemainingTime > pbTimer)
+                            PlaySound();
+
+                        pbActive = true;
+                        pbTimer = status.RemainingTime;
+                    }
+                }
+
+                if (!pbActive)
+                    pbTimer = 0f;
+            }
+        }
     }
 
-    public async void PlaySound()
+    public void PlaySound()
     {
         if (Configuration.Enabled)
         {
