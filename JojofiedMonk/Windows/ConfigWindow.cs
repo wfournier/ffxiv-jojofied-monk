@@ -42,7 +42,7 @@ public class ConfigWindow : Window, IDisposable
                           plugin.soundOptionsDict.Count))
         {
             Configuration.SoundOption = (SoundOption)soundOptionIndex;
-            chatGui.Print($"{plugin.soundOptionsDict[Configuration.SoundOption]} will now be played");
+            chatGui.Print($"[JojofiedMonk] {plugin.soundOptionsDict[Configuration.SoundOption]} will now be played");
             Configuration.Save();
         }
 

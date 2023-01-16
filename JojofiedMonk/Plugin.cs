@@ -1,10 +1,15 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Media;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
+using Dalamud.Logging;
 using Dalamud.Plugin;
+using NAudio.Wave;
 using JojofiedMonk.Windows;
 
 namespace JojofiedMonk;
@@ -22,6 +27,8 @@ public sealed class Plugin : IDalamudPlugin
 
     public WindowSystem WindowSystem = new("JojofiedMonk");
 
+    private SoundPlayer SoundPlayer;
+
     public Plugin(
         [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
         [RequiredVersion("1.0")] CommandManager commandManager)
@@ -31,6 +38,8 @@ public sealed class Plugin : IDalamudPlugin
 
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.Initialize(PluginInterface);
+
+        GetAudioFile();
 
         // you might normally want to embed resources and load them from the manifest stream
         var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "jojo.png");
@@ -77,29 +86,33 @@ public sealed class Plugin : IDalamudPlugin
             case "t" when !Configuration.SoundEnabled:
                 Configuration.SoundEnabled = true;
                 Configuration.Save();
-                chatGui.Print("Jojofied is now enabled");
+                chatGui.Print("[JojofiedMonk] is now enabled");
                 break;
             case "off":
             case "toggle" when Configuration.SoundEnabled:
             case "t" when Configuration.SoundEnabled:
                 Configuration.SoundEnabled = false;
                 Configuration.Save();
-                chatGui.Print("Jojofied is now disabled");
+                chatGui.Print("[JojofiedMonk] is now disabled");
                 break;
             case "ora":
                 Configuration.SoundOption = SoundOption.ORA;
                 Configuration.Save();
-                chatGui.Print($"{soundOptionsDict[SoundOption.ORA]} will now be played");
+                chatGui.Print($"[JojofiedMonk] {soundOptionsDict[SoundOption.ORA]} will now be played");
                 break;
             case "muda":
                 Configuration.SoundOption = SoundOption.MUDA;
                 Configuration.Save();
-                chatGui.Print($"{soundOptionsDict[SoundOption.MUDA]} will now be played");
+                chatGui.Print($"[JojofiedMonk] {soundOptionsDict[SoundOption.MUDA]} will now be played");
                 break;
             case "play":
             case "test":
-                // TODO: Play a test sound
-                chatGui.Print("test sound");
+                PlaySound();
+                chatGui.Print("[JojofiedMonk] Playing test sound");
+                break;
+            case "stop":
+                StopSound();
+                chatGui.Print("[JojofiedMonk] Stopping sound");
                 break;
             case "":
                 // in response to the slash command, just display our main ui
@@ -109,7 +122,8 @@ public sealed class Plugin : IDalamudPlugin
                 chatGui.Print("Invalid usage: Command must be \"/jojo <option>\"\n" +
                               "on / off / toggle - Enables or disables sound\n" +
                               "ora / muda - Changes the sound that will be played\n" +
-                              "play / test - Plays the configured sound");
+                              "play / test - Plays the configured sound\n" +
+                              "stop - Stop the sound");
                 break;
         }
     }
@@ -118,6 +132,27 @@ public sealed class Plugin : IDalamudPlugin
     {
         DrawConfigUI();
     }
+
+    public string GetAudioFile()
+    {
+        var filename = Configuration.SoundOption switch
+        {
+            SoundOption.ORA => "ora.wav",
+            SoundOption.MUDA => "muda.wav",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        return Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, filename);
+    }
+
+    private void PlaySound()
+    {
+        SoundPlayer = new SoundPlayer(GetAudioFile());
+        SoundPlayer.Play();
+    }
+
+    private void StopSound() => SoundPlayer.Stop();
+
 
     private void DrawUI()
     {
