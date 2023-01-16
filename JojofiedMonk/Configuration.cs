@@ -11,17 +11,23 @@ public class Configuration : IPluginConfiguration
     [NonSerialized]
     private DalamudPluginInterface? PluginInterface;
 
-    public bool SoundEnabled { get; set; } = true;
+    private Plugin plugin;
+
+    public bool Enabled { get; set; } = true;
     public SoundOption SoundOption { get; set; } = SoundOption.ORA;
     public int Version { get; set; } = 0;
 
-    public void Initialize(DalamudPluginInterface pluginInterface)
+    public void Initialize(DalamudPluginInterface pluginInterface, Plugin plugin)
     {
         PluginInterface = pluginInterface;
+        this.plugin = plugin;
     }
 
     public void Save()
     {
         PluginInterface!.SavePluginConfig(this);
+        plugin.SetAudioFile();
+
+        if(!Enabled) plugin.StopSound();
     }
 }

@@ -37,9 +37,9 @@ public sealed class Plugin : IDalamudPlugin
         CommandManager = commandManager;
 
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-        Configuration.Initialize(PluginInterface);
+        Configuration.Initialize(PluginInterface, this);
 
-        GetAudioFile();
+        SetAudioFile();
 
         // you might normally want to embed resources and load them from the manifest stream
         var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "jojo.png");
@@ -82,16 +82,16 @@ public sealed class Plugin : IDalamudPlugin
         switch (args)
         {
             case "on":
-            case "toggle" when !Configuration.SoundEnabled:
-            case "t" when !Configuration.SoundEnabled:
-                Configuration.SoundEnabled = true;
+            case "toggle" when !Configuration.Enabled:
+            case "t" when !Configuration.Enabled:
+                Configuration.Enabled = true;
                 Configuration.Save();
                 chatGui.Print("[JojofiedMonk] is now enabled");
                 break;
             case "off":
-            case "toggle" when Configuration.SoundEnabled:
-            case "t" when Configuration.SoundEnabled:
-                Configuration.SoundEnabled = false;
+            case "toggle" when Configuration.Enabled:
+            case "t" when Configuration.Enabled:
+                Configuration.Enabled = false;
                 Configuration.Save();
                 chatGui.Print("[JojofiedMonk] is now disabled");
                 break;
@@ -107,8 +107,11 @@ public sealed class Plugin : IDalamudPlugin
                 break;
             case "play":
             case "test":
-                PlaySound();
-                chatGui.Print("[JojofiedMonk] Playing test sound");
+                if (Configuration.Enabled)
+                {
+                    PlaySound();
+                    chatGui.Print("[JojofiedMonk] Playing test sound");
+                }
                 break;
             case "stop":
                 StopSound();
@@ -133,7 +136,7 @@ public sealed class Plugin : IDalamudPlugin
         DrawConfigUI();
     }
 
-    public string GetAudioFile()
+    public void SetAudioFile()
     {
         var filename = Configuration.SoundOption switch
         {
@@ -142,16 +145,16 @@ public sealed class Plugin : IDalamudPlugin
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        return Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, filename);
+        var path = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, filename);
+        SoundPlayer = new SoundPlayer(path);
     }
 
-    private void PlaySound()
+    public void PlaySound()
     {
-        SoundPlayer = new SoundPlayer(GetAudioFile());
-        SoundPlayer.Play();
+        if(Configuration.Enabled) SoundPlayer.Play();
     }
 
-    private void StopSound() => SoundPlayer.Stop();
+    public void StopSound() => SoundPlayer.Stop();
 
 
     private void DrawUI()

@@ -27,7 +27,7 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
-        ImGui.Text($"The plugin is currently {(Plugin.Configuration.SoundEnabled ? "enabled" : "disabled")}");
+        ImGui.Text($"The plugin is currently {(Plugin.Configuration.Enabled ? "enabled" : "disabled")}");
 
         if (ImGui.Button("Show Settings")) Plugin.DrawConfigUI();
 

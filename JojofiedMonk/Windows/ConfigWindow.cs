@@ -30,10 +30,10 @@ public class ConfigWindow : Window, IDisposable
 
     public override void Draw()
     {
-        var configEnabled = Configuration.SoundEnabled;
+        var configEnabled = Configuration.Enabled;
         if (ImGui.Checkbox("Enabled", ref configEnabled))
         {
-            Configuration.SoundEnabled = configEnabled;
+            Configuration.Enabled = configEnabled;
             Configuration.Save();
         }
 
