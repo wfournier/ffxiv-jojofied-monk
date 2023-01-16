@@ -1,23 +1,35 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Media;
+using System.Threading;
+using System.Threading.Tasks;
+using Dalamud.Game;
+using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
-using Dalamud.Logging;
 using Dalamud.Plugin;
-using NAudio.Wave;
 using JojofiedMonk.Windows;
 
 namespace JojofiedMonk;
 
 public sealed class Plugin : IDalamudPlugin
 {
+
+    public string Name => "Jojofied Monk";
+
     private const string jojoCommand = "/jojo";
     private const string jojoSettings = "/jojosettings";
+
+    private DalamudPluginInterface PluginInterface { get; init; }
+    private CommandManager CommandManager { get; init; }
+    public Configuration Configuration { get; init; }
+    [PluginService] public ChatGui chatGui { get; private set; }
+    [PluginService] public static Framework Framework { get; private set; } = null!;
+    [PluginService] public static ClientState ClientState { get; set; }
 
     public Dictionary<SoundOption, string> soundOptionsDict = new()
     {
@@ -25,9 +37,10 @@ public sealed class Plugin : IDalamudPlugin
         { SoundOption.MUDA, "Muda  Muda" }
     };
 
-    public WindowSystem WindowSystem = new("JojofiedMonk");
+    //private bool isSoundPlaying = false;
+    private SoundPlayer SoundPlayer = new();
 
-    private SoundPlayer SoundPlayer;
+    public WindowSystem WindowSystem = new("JojofiedMonk");
 
     public Plugin(
         [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
@@ -39,7 +52,7 @@ public sealed class Plugin : IDalamudPlugin
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.Initialize(PluginInterface, this);
 
-        SetAudioFile();
+        //SetAudioFile();
 
         // you might normally want to embed resources and load them from the manifest stream
         var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "jojo.png");
@@ -60,16 +73,8 @@ public sealed class Plugin : IDalamudPlugin
 
         PluginInterface.UiBuilder.Draw += DrawUI;
         PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+        Framework.Update += FrameworkOnUpdate;
     }
-
-    private DalamudPluginInterface PluginInterface { get; init; }
-    private CommandManager CommandManager { get; init; }
-    public Configuration Configuration { get; init; }
-
-    [PluginService]
-    public ChatGui chatGui { get; private set; }
-
-    public string Name => "Jojofied Monk";
 
     public void Dispose()
     {
@@ -112,17 +117,18 @@ public sealed class Plugin : IDalamudPlugin
                     PlaySound();
                     chatGui.Print("[JojofiedMonk] Playing test sound");
                 }
+
                 break;
             case "stop":
                 StopSound();
-                chatGui.Print("[JojofiedMonk] Stopping sound");
+                chatGui.Print("Stopping sound");
                 break;
             case "":
                 // in response to the slash command, just display our main ui
                 WindowSystem.GetWindow("Jojofied").IsOpen = true;
                 break;
             default:
-                chatGui.Print("Invalid usage: Command must be \"/jojo <option>\"\n" +
+                chatGui.Print("[JojofiedMonk] Invalid usage: Command must be \"/jojo <option>\"\n" +
                               "on / off / toggle - Enables or disables sound\n" +
                               "ora / muda - Changes the sound that will be played\n" +
                               "play / test - Plays the configured sound\n" +
@@ -136,25 +142,47 @@ public sealed class Plugin : IDalamudPlugin
         DrawConfigUI();
     }
 
-    public void SetAudioFile()
+    private void FrameworkOnUpdate(Framework framework)
     {
-        var filename = Configuration.SoundOption switch
+        //if (!isSoundPlaying)
+        //{
+        //    using (var enumerator = ClientState.LocalPlayer?.StatusList.GetEnumerator())
+        //    {
+        //        while (enumerator != null && enumerator.MoveNext())
+        //        {
+        //            var status = enumerator.Current;
+        //            if (status.GameData.Name == "Perfect Balance")
+        //            {
+        //                PlaySound();
+        //                return;
+        //            }
+        //        }
+        //    }
+        //}
+    }
+
+    public async void PlaySound()
+    {
+        if (Configuration.Enabled)
         {
-            SoundOption.ORA => "ora.wav",
-            SoundOption.MUDA => "muda.wav",
-            _ => throw new ArgumentOutOfRangeException()
-        };
+            var filename = Configuration.SoundOption switch
+            {
+                SoundOption.ORA => "ora.wav",
+                SoundOption.MUDA => "muda.wav",
+                _ => throw new ArgumentOutOfRangeException()
+            };
 
-        var path = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, filename);
-        SoundPlayer = new SoundPlayer(path);
+            var path = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, filename);
+
+            SoundPlayer.SoundLocation = path;
+            SoundPlayer.Play();
+        }
     }
 
-    public void PlaySound()
+    public void StopSound()
     {
-        if(Configuration.Enabled) SoundPlayer.Play();
+        SoundPlayer.Stop();
     }
-
-    public void StopSound() => SoundPlayer.Stop();
 
 
     private void DrawUI()
