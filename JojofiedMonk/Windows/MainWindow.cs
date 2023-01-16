@@ -8,35 +8,32 @@ namespace JojofiedMonk.Windows;
 
 public class MainWindow : Window, IDisposable
 {
-    private TextureWrap jojoImage;
-    private Plugin Plugin;
+    private readonly TextureWrap jojoImage;
+    private readonly Plugin Plugin;
 
     public MainWindow(Plugin plugin, TextureWrap jojoImage) : base(
         "Jojofied", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
-        this.Size = new Vector2(280, 340);
+        Size = new Vector2(280, 340);
 
         this.jojoImage = jojoImage;
-        this.Plugin = plugin;
+        Plugin = plugin;
     }
 
     public void Dispose()
     {
-        this.jojoImage.Dispose();
+        jojoImage.Dispose();
     }
 
     public override void Draw()
     {
-        ImGui.Text($"The plugin is currently {(this.Plugin.Configuration.SoundEnabled ? "enabled" : "disabled")}");
+        ImGui.Text($"The plugin is currently {(Plugin.Configuration.SoundEnabled ? "enabled" : "disabled")}");
 
-        if (ImGui.Button("Show Settings"))
-        {
-            this.Plugin.DrawConfigUI();
-        }
+        if (ImGui.Button("Show Settings")) Plugin.DrawConfigUI();
 
         ImGui.Spacing();
 
-        ImGui.Image(this.jojoImage.ImGuiHandle, new Vector2(this.jojoImage.Width, this.jojoImage.Height));
+        ImGui.Image(jojoImage.ImGuiHandle, new Vector2(jojoImage.Width, jojoImage.Height));
         ImGui.Text("Plugin by Cidolfus Highwind (Cactuar)\n" +
                    "wfournier on GitHub");
     }

@@ -1,30 +1,27 @@
+using System;
 using Dalamud.Configuration;
 using Dalamud.Plugin;
-using System;
-using JojofiedMonk;
 
-namespace JojofiedMonk
+namespace JojofiedMonk;
+
+[Serializable]
+public class Configuration : IPluginConfiguration
 {
-    [Serializable]
-    public class Configuration : IPluginConfiguration
+    // the below exist just to make saving less cumbersome
+    [NonSerialized]
+    private DalamudPluginInterface? PluginInterface;
+
+    public bool SoundEnabled { get; set; } = true;
+    public SoundOption SoundOption { get; set; } = SoundOption.ORA;
+    public int Version { get; set; } = 0;
+
+    public void Initialize(DalamudPluginInterface pluginInterface)
     {
-        public int Version { get; set; } = 0;
+        PluginInterface = pluginInterface;
+    }
 
-        public bool SoundEnabled { get; set; } = true;
-        public SoundOption SoundOption { get; set; } = SoundOption.ORA;
-
-        // the below exist just to make saving less cumbersome
-        [NonSerialized]
-        private DalamudPluginInterface? PluginInterface;
-
-        public void Initialize(DalamudPluginInterface pluginInterface)
-        {
-            this.PluginInterface = pluginInterface;
-        }
-
-        public void Save()
-        {
-            this.PluginInterface!.SavePluginConfig(this);
-        }
+    public void Save()
+    {
+        PluginInterface!.SavePluginConfig(this);
     }
 }
