@@ -2,11 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Media;
-using System.Threading;
-using System.Threading.Tasks;
 using Dalamud.Game;
 using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
 using Dalamud.Interface.Windowing;
@@ -18,18 +15,10 @@ namespace JojofiedMonk;
 
 public sealed class Plugin : IDalamudPlugin
 {
-
-    public string Name => "Jojofied Monk";
-
     private const string jojoCommand = "/jojo";
     private const string jojoSettings = "/jojosettings";
 
-    private DalamudPluginInterface PluginInterface { get; init; }
-    private CommandManager CommandManager { get; init; }
-    public Configuration Configuration { get; init; }
-    [PluginService] public ChatGui chatGui { get; private set; }
-    [PluginService] public static Framework Framework { get; private set; } = null!;
-    [PluginService] public static ClientState ClientState { get; set; }
+    private float pbTimer;
 
     public Dictionary<SoundOption, string> soundOptionsDict = new()
     {
@@ -38,7 +27,7 @@ public sealed class Plugin : IDalamudPlugin
     };
 
     //private bool isSoundPlaying = false;
-    private SoundPlayer SoundPlayer = new();
+    private readonly SoundPlayer SoundPlayer = new();
 
     public WindowSystem WindowSystem = new("JojofiedMonk");
 
@@ -75,6 +64,21 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
         Framework.Update += FrameworkOnUpdate;
     }
+
+    private DalamudPluginInterface PluginInterface { get; init; }
+    private CommandManager CommandManager { get; init; }
+    public Configuration Configuration { get; init; }
+
+    [PluginService]
+    public ChatGui chatGui { get; private set; }
+
+    [PluginService]
+    public static Framework Framework { get; private set; } = null!;
+
+    [PluginService]
+    public static ClientState ClientState { get; set; }
+
+    public string Name => "Jojofied Monk";
 
     public void Dispose()
     {
@@ -143,8 +147,6 @@ public sealed class Plugin : IDalamudPlugin
     {
         DrawConfigUI();
     }
-
-    private float pbTimer = 0f;
 
     private void FrameworkOnUpdate(Framework framework)
     {

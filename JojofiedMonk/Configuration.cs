@@ -7,11 +7,11 @@ namespace JojofiedMonk;
 [Serializable]
 public class Configuration : IPluginConfiguration
 {
+    private Plugin plugin;
+
     // the below exist just to make saving less cumbersome
     [NonSerialized]
     private DalamudPluginInterface? PluginInterface;
-
-    private Plugin plugin;
 
     public bool Enabled { get; set; } = true;
     public SoundOption SoundOption { get; set; } = SoundOption.ORA;
@@ -27,6 +27,6 @@ public class Configuration : IPluginConfiguration
     {
         PluginInterface!.SavePluginConfig(this);
 
-        if(!Enabled) plugin.StopSound();
+        if (!Enabled) plugin.StopSound();
     }
 }

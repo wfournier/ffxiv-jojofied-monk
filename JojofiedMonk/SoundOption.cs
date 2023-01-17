@@ -1,4 +1,4 @@
-namespace JojofiedMonk;
+﻿namespace JojofiedMonk;
 
 public enum SoundOption
 {
