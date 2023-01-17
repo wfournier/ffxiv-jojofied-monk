@@ -2,6 +2,6 @@
 
 public enum SoundOption
 {
-    ORA,
-    MUDA
+    Ora,
+    Muda
 }

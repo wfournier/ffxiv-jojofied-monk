@@ -9,7 +9,7 @@ namespace JojofiedMonk.Windows;
 public class MainWindow : Window, IDisposable
 {
     private readonly TextureWrap jojoImage;
-    private readonly Plugin Plugin;
+    private readonly Plugin plugin;
 
     public MainWindow(Plugin plugin, TextureWrap jojoImage) : base(
         "Jojofied", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
@@ -17,7 +17,7 @@ public class MainWindow : Window, IDisposable
         Size = new Vector2(280, 340);
 
         this.jojoImage = jojoImage;
-        Plugin = plugin;
+        this.plugin = plugin;
     }
 
     public void Dispose()
@@ -27,9 +27,9 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
-        ImGui.Text($"The plugin is currently {(Plugin.Configuration.Enabled ? "enabled" : "disabled")}");
+        ImGui.Text($"The plugin is currently {(plugin.Configuration.Enabled ? "enabled" : "disabled")}");
 
-        if (ImGui.Button("Show Settings")) Plugin.DrawConfigUI();
+        if (ImGui.Button("Show Settings")) plugin.DrawConfigUI();
 
         ImGui.Spacing();
 

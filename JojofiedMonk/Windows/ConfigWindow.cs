@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.Gui;
@@ -9,11 +9,11 @@ namespace JojofiedMonk.Windows;
 
 public class ConfigWindow : Window, IDisposable
 {
-    private readonly ChatGui chatGui;
-    private readonly Configuration Configuration;
+    private readonly ChatGui? chatGui;
+    private readonly Configuration config;
     private readonly Plugin plugin;
 
-    public ConfigWindow(Plugin plugin, ChatGui chatGui) : base(
+    public ConfigWindow(Plugin plugin, ChatGui? chatGui) : base(
         "Jojofied Configuration",
         ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)
@@ -22,7 +22,7 @@ public class ConfigWindow : Window, IDisposable
         SizeCondition = ImGuiCond.Always;
 
         this.plugin = plugin;
-        Configuration = plugin.Configuration;
+        config = plugin.Configuration;
         this.chatGui = chatGui;
     }
 
@@ -30,20 +30,20 @@ public class ConfigWindow : Window, IDisposable
 
     public override void Draw()
     {
-        var configEnabled = Configuration.Enabled;
+        var configEnabled = config.Enabled;
         if (ImGui.Checkbox("Enabled", ref configEnabled))
         {
-            Configuration.Enabled = configEnabled;
-            Configuration.Save();
+            config.Enabled = configEnabled;
+            config.Save();
         }
 
-        var soundOptionIndex = (int)Configuration.SoundOption;
-        if (ImGui.ListBox("Sound options", ref soundOptionIndex, plugin.soundOptionsDict.Values.ToArray(),
-                          plugin.soundOptionsDict.Count))
+        var soundOptionIndex = (int)config.SoundOption;
+        if (ImGui.ListBox("Sound options", ref soundOptionIndex, plugin.SoundOptionsDict.Values.ToArray(),
+                          plugin.SoundOptionsDict.Count))
         {
-            Configuration.SoundOption = (SoundOption)soundOptionIndex;
-            chatGui.Print($"[JojofiedMonk] {plugin.soundOptionsDict[Configuration.SoundOption]} will now be played");
-            Configuration.Save();
+            config.SoundOption = (SoundOption)soundOptionIndex;
+            chatGui?.Print($"[JojofiedMonk] {plugin.SoundOptionsDict[config.SoundOption]} will now be played");
+            config.Save();
         }
 
         ImGui.Spacing();
