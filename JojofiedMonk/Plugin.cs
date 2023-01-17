@@ -18,6 +18,8 @@ public sealed class Plugin : IDalamudPlugin
     private const string jojoCommand = "/jojo";
     private const string jojoSettings = "/jojosettings";
 
+    private readonly SoundPlayer SoundPlayer = new();
+
     private float pbTimer;
 
     public Dictionary<SoundOption, string> soundOptionsDict = new()
@@ -25,9 +27,6 @@ public sealed class Plugin : IDalamudPlugin
         { SoundOption.ORA, "Ora Ora" },
         { SoundOption.MUDA, "Muda  Muda" }
     };
-
-    //private bool isSoundPlaying = false;
-    private readonly SoundPlayer SoundPlayer = new();
 
     public WindowSystem WindowSystem = new("JojofiedMonk");
 
@@ -41,9 +40,6 @@ public sealed class Plugin : IDalamudPlugin
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Configuration.Initialize(PluginInterface, this);
 
-        //SetAudioFile();
-
-        // you might normally want to embed resources and load them from the manifest stream
         var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "jojo.png");
         var jojoImage = PluginInterface.UiBuilder.LoadImage(imagePath);
 
@@ -62,7 +58,7 @@ public sealed class Plugin : IDalamudPlugin
 
         PluginInterface.UiBuilder.Draw += DrawUI;
         PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
-        Framework.Update += FrameworkOnUpdate;
+        Framework.Update += CheckPerfectBalanceIsCast;
     }
 
     private DalamudPluginInterface PluginInterface { get; init; }
@@ -148,35 +144,31 @@ public sealed class Plugin : IDalamudPlugin
         DrawConfigUI();
     }
 
-    private void FrameworkOnUpdate(Framework framework)
+    private void CheckPerfectBalanceIsCast(Framework framework)
     {
         if (Configuration.Enabled)
         {
-            using (var enumerator = ClientState.LocalPlayer?.StatusList.GetEnumerator())
+            using var enumerator = ClientState.LocalPlayer?.StatusList.GetEnumerator();
+            while (enumerator != null && enumerator.MoveNext())
             {
-                var pbActive = false;
-                while (enumerator != null && enumerator.MoveNext())
+                var status = enumerator.Current;
+                if (status.GameData.Name == "Perfect Balance")
                 {
-                    var status = enumerator.Current;
-                    if (status.GameData.Name == "Perfect Balance")
-                    {
-                        // For some god forsaken reason, the remaining time starts at -20 instead of 20
-                        var time = Math.Abs(status.RemainingTime);
-                        var stacks = status.StackCount;
+                    // For some god forsaken reason, the remaining time starts at -20 instead of 20, so we use Math.Abs()
+                    var time = Math.Abs(status.RemainingTime);
+                    var stacks = status.StackCount;
 
-                        // If the time remaining is higher than previous update and stack count is 3 (meaning we just cast PB)
-                        if (time > pbTimer && stacks == 3)
-                            PlaySound();
+                    // If the time remaining is higher than previous update and stack count is 3 (meaning we just cast PB)
+                    if (time > pbTimer && stacks == 3)
+                        PlaySound();
 
-                        pbActive = true;
-                        pbTimer = time;
-                    }
+                    pbTimer = time;
+                    return;
                 }
-
-                // If Perfect Balance is not in the list of statuses, manually set timer to 0 just in case
-                if (!pbActive)
-                    pbTimer = 0f;
             }
+
+            // If Perfect Balance is not in the list of statuses, manually set timer to 0 just in case
+            pbTimer = 0f;
         }
     }
 
